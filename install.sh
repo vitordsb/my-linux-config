@@ -16,7 +16,7 @@ bash dev.sh
 bash ui.sh
 bash apps.sh
 bash neovim.sh
-bash zsh.sh
+bash fish.sh
 bash finalize.sh
 
 echo "✅ Instalação completa!"
