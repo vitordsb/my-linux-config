@@ -5,5 +5,9 @@ set -u  # erro se variável não definida
 echo "🧹 Limpando pacotes desnecessários..."
 apt autoremove -y && apt clean
 
-echo "🔁 Rebootando sistema em 5s..."
-sleep 5 && reboot
+if [ "${LINUX_SETUP_SKIP_REBOOT:-0}" = "1" ]; then
+    echo "ℹ️  Reboot automático adiado (será tratado pelo instalador principal)."
+else
+    echo "🔁 Rebootando sistema em 5s..."
+    sleep 5 && reboot
+fi

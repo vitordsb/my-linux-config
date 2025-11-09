@@ -42,6 +42,4 @@ fi
 sudo -u "$TARGET_USER" git clone --depth 1 https://github.com/vitordsb/MyNeovim.git "$NVIM_CONFIG_DIR"
 chown -R "$TARGET_USER":"$TARGET_USER" "$NVIM_CONFIG_DIR"
 
-echo "✅ Neovim configurado! instalando apps"
-
-bash apps.sh
+echo "✅ Neovim configurado!"

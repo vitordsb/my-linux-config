@@ -19,5 +19,3 @@ FLUSH PRIVILEGES;
 SQL
 
 echo "✅ Banco de dados configurado!"
-
-bash finalize.sh

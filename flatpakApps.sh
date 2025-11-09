@@ -13,6 +13,3 @@ flatpak install -y --noninteractive flathub it.mijorus.gearlever
 flatpak install -y --noninteractive flathub cc.arduino.IDE2
 
 echo "Aplicativos do flatpak instalados com sucesso!"
-
-echo "Começando a instalar e configurar mysql"
-bash mysql.sh

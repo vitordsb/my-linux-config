@@ -12,6 +12,4 @@ sudo apt install -y apt-transport-https
 sudo apt update
 sudo apt install -y windsurf
 
-echo "✅ WindSurf instalado! começando a instalar os apps"
-
-bash flatpakApps.sh
+echo "✅ WindSurf instalado!"

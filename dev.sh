@@ -54,6 +54,4 @@ ln -sf /opt/android-studio/bin/studio.sh /usr/local/bin/android-studio
 popd >/dev/null
 rm -rf "$ANDROID_TMP_DIR"
 
-echo "✅ Ferramentas de desenvolvimento configuradas! vamos instalar o fish"
-
-bash fish.sh
+echo "✅ Ferramentas de desenvolvimento configuradas!"

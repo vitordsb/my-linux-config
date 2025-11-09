@@ -193,6 +193,4 @@ chown -R "$TARGET_USER":"$TARGET_USER" "$(dirname "$FISH_CONFIG")"
 
 echo "✅ Fish configurado com sucesso! vamos tornar ele o padrão"
 
-echo "📝 Instalando e configurando Neovim..."
-
-bash neovim.sh
+echo "✅ Fish shell configurado!"

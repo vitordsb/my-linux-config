@@ -24,6 +24,4 @@ apt install -y gnome-software-plugin-flatpak
 echo "📦 Instalando o Flathub..."
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
-echo "✅ Base configurada! vamos instalar as ferramentas de desenvolvimento"
-
-bash dev.sh 
+echo "✅ Base configurada! (módulo base finalizado)"
