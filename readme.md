@@ -1,24 +1,19 @@
 Lembrete de como instalar tudo
 
+**Primeiro passo é instalar o git na maquina com:**
 
-primeiro passo é instalar o git na maquina com:
+`sudo apt-get install git`
+##
 
-'''sudo apt-get install git'''
+depois disso, baixe o repositório: `git clone https://github.com/vitordsb/linux-setup`
+##
 
-depois disso, baixe o repositório com:
+Ápos isso entre na pasta onde foi baixado o repositório.
 
-'''git clone https://github.com/vitordsb/linux-setup'''
+`cd linux-setup`
 
-apos isso entre na pasta onde foi baixado o repositório.
+transforme o arquivo ./install.sh em executável e faça a execução com:
 
-'''cd linux-setup'''
+`sudo chmod +x install.sh && sudo ./install.sh`
 
-transforme o arquivo install.sh em executavel com:
-
-'''chmod +x install.sh'''
-
-e execute-o com:
-
-'''./install.sh'''
-
-e pronto, só aguardar a instalação de tudo ser feito.
+**O ./install.sh tem que ser executado como adm (sudo) para ocorrer sem erros de permissão**
