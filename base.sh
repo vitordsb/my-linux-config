@@ -2,9 +2,6 @@
 set -e  # para se o script falhar
 set -u  # erro se variável não definida
 
-echo "📦 Atualizando sistema e instalando pacotes básicos..."
-apt update && apt upgrade -y
-
 echo "📦 Instalando pacotes essenciais..."
 apt install -y curl cmake wget build-essential software-properties-common unzip neofetch htop preload
 

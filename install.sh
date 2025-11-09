@@ -29,6 +29,27 @@ run_preflight_checks
 
 declare -a COMPLETED_STEPS=()
 
+MODULES=(
+  "1|base.sh|Base do sistema"
+  "2|dev.sh|Ferramentas de desenvolvimento"
+  "3|fish.sh|Shell e terminal"
+  "4|neovim.sh|Neovim"
+  "5|apps.sh|Aplicativos via APT"
+  "6|flatpakApps.sh|Aplicativos via Flatpak"
+  "7|mysql.sh|Bancos de dados"
+  "8|finalize.sh|Limpeza final"
+)
+
+declare -A MODULE_ID_TO_SCRIPT=()
+declare -A MODULE_ID_TO_LABEL=()
+declare -a MODULE_IDS=()
+for entry in "${MODULES[@]}"; do
+  IFS="|" read -r module_id module_script module_label <<<"$entry"
+  MODULE_ID_TO_SCRIPT["$module_id"]="$module_script"
+  MODULE_ID_TO_LABEL["$module_id"]="$module_label"
+  MODULE_IDS+=("$module_id")
+done
+
 run_module() {
   local script_path="$1"
   local label="$2"
@@ -76,33 +97,94 @@ EOF
   ls_log_info "📄 Relatório pós-instalação salvo em ${report_path}"
 }
 
-STEPS=(
-  "base.sh|Base do sistema"
-  "dev.sh|Ferramentas de desenvolvimento"
-  "fish.sh|Shell e terminal"
-  "neovim.sh|Neovim"
-  "apps.sh|Aplicativos via APT"
-  "flatpakApps.sh|Aplicativos via Flatpak"
-  "mysql.sh|Bancos de dados"
-  "finalize.sh|Limpeza final"
-)
+show_menu() {
+  ls_log_section "Selecione os módulos para instalar"
+  for entry in "${MODULES[@]}"; do
+    IFS="|" read -r module_id _module_script module_label <<<"$entry"
+    echo "  ${module_id}) ${module_label}"
+  done
+  echo "  all) Instalar todos os módulos na ordem acima (padrão)"
+  echo
+}
 
-for entry in "${STEPS[@]}"; do
-  IFS="|" read -r script label <<<"$entry"
+prompt_module_selection() {
+  local selection
+  local normalized
+  declare -ga SELECTED_IDS=()
+  while true; do
+    show_menu
+    read -r -p "Digite os módulos desejados (ex.: 1 3 5 ou all): " selection || true
+    selection="${selection,,}"
+    selection="${selection//,/ }"
+    selection="${selection//[^a-z0-9[:space:]]/ }"
+    # Remove espaços duplicados
+    normalized="$(echo "$selection" | tr -s '[:space:]' ' ' | sed 's/^ *//;s/ *$//')"
+    if [ -z "$normalized" ] || [ "$normalized" = "all" ]; then
+      SELECTED_IDS=("${MODULE_IDS[@]}")
+      break
+    fi
+    read -ra tokens <<<"$normalized"
+    if [ "${#tokens[@]}" -eq 0 ]; then
+      ls_log_warn "Entrada vazia. Tente novamente."
+      continue
+    fi
+    local all_valid=1
+    local tmp_ids=()
+    for token in "${tokens[@]}"; do
+      if [[ ! "$token" =~ ^[0-9]+$ ]]; then
+        ls_log_warn "Entrada inválida: '${token}'. Use números ou 'all'."
+        all_valid=0
+        break
+      fi
+      if [ -z "${MODULE_ID_TO_SCRIPT[$token]:-}" ]; then
+        ls_log_warn "Módulo '${token}' não existe. Escolha um dos números listados."
+        all_valid=0
+        break
+      fi
+      tmp_ids+=("$token")
+    done
+    if [ "$all_valid" -eq 1 ]; then
+      SELECTED_IDS=("${tmp_ids[@]}")
+      break
+    fi
+  done
+}
+
+prompt_module_selection
+
+declare -A SELECTED_MAP=()
+for module_id in "${SELECTED_IDS[@]}"; do
+  SELECTED_MAP["$module_id"]=1
+done
+
+FINALIZE_SELECTED=0
+
+for entry in "${MODULES[@]}"; do
+  IFS="|" read -r module_id script label <<<"$entry"
+  if [ -z "${SELECTED_MAP[$module_id]:-}" ]; then
+    continue
+  fi
   if [ "$script" = "finalize.sh" ]; then
+    FINALIZE_SELECTED=1
     export LINUX_SETUP_SKIP_REBOOT=1
   fi
   run_module "$script" "$label"
 done
 
-unset LINUX_SETUP_SKIP_REBOOT || true
+if [ "$FINALIZE_SELECTED" -eq 1 ]; then
+  unset LINUX_SETUP_SKIP_REBOOT || true
+fi
 
 generate_post_install_report "$TARGET_USER" "$TARGET_HOME" "${COMPLETED_STEPS[@]}"
 
-if [ "${LINUX_SETUP_AUTO_REBOOT:-1}" = "1" ]; then
-  ls_log_info "🔁 Sistema será reiniciado em 10 segundos..."
-  sleep 10
-  reboot
+if [ "$FINALIZE_SELECTED" -eq 1 ]; then
+  if [ "${LINUX_SETUP_AUTO_REBOOT:-1}" = "1" ]; then
+    ls_log_info "🔁 Sistema será reiniciado em 10 segundos..."
+    sleep 10
+    reboot
+  else
+    ls_log_warn "Reboot automático desativado. Execute 'sudo reboot' quando estiver pronto."
+  fi
 else
-  ls_log_warn "Reboot automático desativado. Execute 'sudo reboot' quando estiver pronto."
+  ls_log_warn "O módulo de limpeza final não foi executado. Considere rodar 'bash finalize.sh' e reiniciar manualmente."
 fi
