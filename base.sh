@@ -6,7 +6,7 @@ echo "📦 Atualizando sistema e instalando pacotes básicos..."
 apt update && apt upgrade -y
 
 echo "📦 Instalando pacotes essenciais..."
-apt install -y curl wget build-essential software-properties-common unzip neofetch htop preload
+apt install -y curl cmake wget build-essential software-properties-common unzip neofetch htop preload
 
 echo "📦 Instalando pacotes de fontes..."
 apt install -y fonts-firacode fonts-jetbrains-mono

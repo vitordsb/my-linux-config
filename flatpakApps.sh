@@ -9,4 +9,5 @@ flatpak install flathub it.mijorus.gearlever -y
 
 echo "Aplicativos do flatpak instalados com sucesso!"
 
-
+echo "Começando a instalar e configurar mysql"
+bash mysql.sh

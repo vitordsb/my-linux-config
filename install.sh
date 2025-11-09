@@ -12,6 +12,5 @@ fi
 
 # Executa módulos
 bash base.sh
-bash finalize.sh
 
 echo "✅ Instalação completa!"
