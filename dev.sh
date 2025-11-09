@@ -17,6 +17,8 @@ apt install -y maven gradle
 
 echo "java, maven e gradle instalado"
 
+apt install android
+
 apt install -y php php-cli php-common php-curl php-fpm php-gd php-mbstring php-mysql php-xml php-xmlrpc php-zip
 
 echo "✅ Ferramentas de desenvolvimento configuradas! vamos instalar o fish"

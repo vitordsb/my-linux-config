@@ -10,6 +10,7 @@ apt install -y curl cmake wget build-essential software-properties-common unzip 
 
 echo "📦 Instalando pacotes de fontes..."
 apt install -y fonts-firacode fonts-jetbrains-mono
+sudo fc-cache -fv
 
 echo "📦 Instalando pacotes de desenvolvimento..."
 apt install gnome-tweaks gnome-shell-extensions -y 
