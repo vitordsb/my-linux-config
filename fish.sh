@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-set -e
+set -e  # para se o script falhar
+set -u  # erro se variável não definida
+
 echo "🐠 Instalando e configurando Fish Shell..."
 
 sudo apt install -y fish
@@ -17,15 +19,11 @@ mkdir -p "$(dirname "$FISH_CONFIG")"
 
 cat <<'EOF' > "$FISH_CONFIG"
 
-# ======================
-# 🐟 Fish Config
-# ======================
-
+# ==========================
+# 🐠 Fish Shell Config - vitor (atualizado)
+# ==========================
 
 set -g fish_greeting ""
-# ==========================
-# 🐠 Fish Shell Config - vitor
-# ==========================
 
 # ---- Tema / Prompt bonito ----
 if type -q starship
@@ -38,9 +36,7 @@ if type -q zoxide
     alias cd='z'
 end
 
-# ---- Path e variáveis de ambiente ----
-set -gx NVM_DIR $HOME/.nvm
-set -gx BUN_INSTALL $HOME/.bun
+# ---- Variáveis globais ----
 set -gx JAVA_HOME /usr/lib/jvm/java-17-openjdk-amd64
 set -gx ANDROID_SDK_ROOT $HOME/Android/Sdk
 set -gx ANDROID_HOME $ANDROID_SDK_ROOT
@@ -48,30 +44,71 @@ set -gx FLUTTER_HOME $HOME/dev/flutter
 set -gx ZED_ALLOW_EMULATED_GPU 1
 set -gx PHP_INI_SCAN_DIR "$HOME/.config/herd-lite/bin:$PHP_INI_SCAN_DIR"
 
-# PATHs combinados
-set -gx PATH $HOME/bin $BUN_INSTALL/bin /usr/local/go/bin $JAVA_HOME/bin \
-    $ANDROID_SDK_ROOT/cmdline-tools/latest/bin $ANDROID_SDK_ROOT/platform-tools \
-    $ANDROID_SDK_ROOT/emulator $FLUTTER_HOME/bin \
-    $HOME/.dotnet $HOME/.dotnet/tools $HOME/.config/herd-lite/bin $PATH
+# ==========================
+# Node, NVM, PNPM, NPM, Bun, Cargo
+# ==========================
 
-# ---- Lazy load NVM e Bun (carrega só quando usados) ----
-function __lazy_nvm
-    if test -s "$NVM_DIR/nvm.sh"
-        bass source "$NVM_DIR/nvm.sh" --no-use ';' nvm use default
+# ---- NVM ----
+set -gx NVM_DIR $HOME/.nvm
+set -gx N_PREFIX $HOME/.local/share/n
+set -gx NODE_PATH /usr/lib/node_modules
+
+# Carrega o nvm.fish (instalador automático)
+if not functions -q nvm
+    if not type -q fisher
+        echo "⚙️  Instalando Fisher..."
+        curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher
     end
+    fisher install jorgebucaran/nvm.fish
 end
-function node; __lazy_nvm; command node $argv; end
-function npm; __lazy_nvm; command npm $argv; end
-function npx; __lazy_nvm; command npx $argv; end
 
-function __lazy_bun
-    if test -s "$HOME/.bun/_bun"
-        bass source "$HOME/.bun/_bun"
-    end
+# Usa o Node padrão automaticamente
+if type -q nvm
+    nvm use default >/dev/null 2>&1
 end
-function bun; __lazy_bun; command bun $argv; end
 
-# ---- Ativação automática de venv Python ----
+# ---- NPM e PNPM ----
+set -gx PNPM_HOME "$HOME/.local/share/pnpm"
+set -gx NPM_CONFIG_PREFIX "$HOME/.npm-global"
+mkdir -p $PNPM_HOME $NPM_CONFIG_PREFIX/bin
+
+# ---- Bun ----
+set -gx BUN_INSTALL "$HOME/.bun"
+if test -d $BUN_INSTALL
+    set -gx PATH $BUN_INSTALL/bin $PATH
+end
+
+# ---- Cargo (Rust) ----
+set -gx CARGO_HOME "$HOME/.cargo"
+set -gx RUSTUP_HOME "$HOME/.rustup"
+if test -d $CARGO_HOME
+    set -gx PATH $CARGO_HOME/bin $PATH
+end
+
+# ---- PATH combinado e ordenado ----
+set -gx PATH \
+    $HOME/bin \
+    $NVM_DIR/versions/node/*/bin \
+    $BUN_INSTALL/bin \
+    $PNPM_HOME \
+    $NPM_CONFIG_PREFIX/bin \
+    $CARGO_HOME/bin \
+    /usr/local/bin \
+    /usr/local/go/bin \
+    $JAVA_HOME/bin \
+    $ANDROID_SDK_ROOT/cmdline-tools/latest/bin \
+    $ANDROID_SDK_ROOT/platform-tools \
+    $ANDROID_SDK_ROOT/emulator \
+    $FLUTTER_HOME/bin \
+    $HOME/.dotnet \
+    $HOME/.dotnet/tools \
+    $HOME/.config/herd-lite/bin \
+    $PATH
+
+# ==========================
+# Python (auto venv)
+# ==========================
+
 function auto_venv_activate --on-variable PWD
     if set -q VIRTUAL_ENV
         deactivate 2>/dev/null
@@ -85,7 +122,10 @@ function auto_venv_activate --on-variable PWD
     end
 end
 
-# ---- Aliases ----
+# ==========================
+# Aliases
+# ==========================
+
 alias ll='ls -lah'
 alias l='ls -l'
 alias rm='rm -rf'
@@ -115,13 +155,13 @@ alias mknext='npx create-next-app@latest ./'
 alias cls='sudo apt autoremove -y && sudo apt autoclean -y'
 alias pacotes='cd /etc/apt/sources.list.d'
 alias myip='curl ipinfo.io'
-
 alias pyinit='python3 -m venv venv'
-
 alias ia='ollama run gemma3:1b'
 alias dbegp='mongosh "mongodb+srv://cluster0.tn4hbrg.mongodb.net/" --apiVersion 1 --username vitordsb2019_db_user'
 
-# ---- Visualizar PDF como imagem no terminal (Kitty + Ueberzug) ----
+# ==========================
+# Visualizar PDF como imagem no terminal
+# ==========================
 function pdfview
     mkdir -p /tmp/pdf_previews
     pdftoppm -jpeg $argv[1] /tmp/pdf_previews/page
@@ -130,6 +170,8 @@ function pdfview
 end
 
 EOF
+
+source ~/.config/fish/config.fish
 
 echo "✅ Fish configurado com sucesso! vamos tornar ele o padrão"
 

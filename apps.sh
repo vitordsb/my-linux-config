@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 set -e  # para se o script falhar
 set -u  # erro se variável não definida
 

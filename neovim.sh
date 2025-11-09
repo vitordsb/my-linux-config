@@ -1,6 +1,6 @@
-
 #!/usr/bin/env bash
-set -e
+set -e  # para se o script falhar
+set -u  # erro se variável não definida
 
 echo "📝 Instalando neovim pelo github"
 git clone https://github.com/neovim/neovim.git && cd neovim

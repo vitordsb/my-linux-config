@@ -1,3 +1,7 @@
+#!/usr/bin/env bash
+set -e  # para se o script falhar
+set -u  # erro se variável não definida
+
 echo "📦 Instalando ferramentas de desenvolvimento banco de dados..."
 apt install -y mysql-client mysql-server postgresql-client postgresql
 
