@@ -11,4 +11,6 @@ mkdir -p ~/.config/nvim
 git clone https://github.com/vitordsb/MyNeovim.git
 mv ~/MyNeovim/* ~/.config/nvim
 
-echo "✅ Neovim configurado!"
+echo "✅ Neovim configurado! instalando apps"
+
+bash apps.sh

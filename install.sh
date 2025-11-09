@@ -12,11 +12,6 @@ fi
 
 # Executa módulos
 bash base.sh
-bash dev.sh
-bash ui.sh
-bash apps.sh
-bash neovim.sh
-bash fish.sh
 bash finalize.sh
 
 echo "✅ Instalação completa!"

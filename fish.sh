@@ -131,4 +131,6 @@ end
 
 EOF
 
-echo "✅ Fish configurado com sucesso!"
+echo "✅ Fish configurado com sucesso! vamos instalar e configurar o neovim"
+
+bash neovim.sh
