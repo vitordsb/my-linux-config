@@ -2,19 +2,37 @@
 set -e  # para se o script falhar
 set -u  # erro se variável não definida
 
+if [ "$EUID" -ne 0 ]; then
+    echo "❌ Execute este script como root (via sudo)."
+    exit 1
+fi
+
+TARGET_USER="${SUDO_USER:-}"
+if [ -z "$TARGET_USER" ] || [ "$TARGET_USER" = "root" ]; then
+    echo "❌ Defina um usuário não-root ao executar (ex.: sudo ./install.sh)."
+    exit 1
+fi
+
+TARGET_HOME="$(getent passwd "$TARGET_USER" | cut -d: -f6)"
+if [ -z "$TARGET_HOME" ]; then
+    echo "❌ Não foi possível descobrir o diretório home de $TARGET_USER."
+    exit 1
+fi
+
+FISH_CONFIG="$TARGET_HOME/.config/fish/config.fish"
+
 echo "🐠 Instalando e configurando Fish Shell..."
 
-sudo apt install -y fish
-chsh -s $(which fish) "$SUDO_USER"
+apt install -y fish
+chsh -s "$(command -v fish)" "$TARGET_USER"
 
 # Instala o gerenciador de plugins Fisher
-su - "$SUDO_USER" -c "fish -c 'curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher'"
+su - "$TARGET_USER" -c "fish -c 'curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher'"
 
 # Instala plugins úteis via Fisher
-su - "$SUDO_USER" -c "fish -c 'fisher install jorgebucaran/nvm.fish PatrickF1/fzf.fish jethrokuan/z exa junegunn/fzf'"
+su - "$TARGET_USER" -c "fish -c 'fisher install jorgebucaran/nvm.fish PatrickF1/fzf.fish jethrokuan/z exa junegunn/fzf'"
 
 # Cria configuração inicial personalizada
-FISH_CONFIG="/home/$SUDO_USER/.config/fish/config.fish"
 mkdir -p "$(dirname "$FISH_CONFIG")"
 
 cat <<'EOF' > "$FISH_CONFIG"
@@ -171,11 +189,9 @@ end
 
 EOF
 
-source ~/.config/fish/config.fish
+chown -R "$TARGET_USER":"$TARGET_USER" "$(dirname "$FISH_CONFIG")"
 
 echo "✅ Fish configurado com sucesso! vamos tornar ele o padrão"
-
-chsh -s $(which fish)
 
 echo "📝 Instalando e configurando Neovim..."
 

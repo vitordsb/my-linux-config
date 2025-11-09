@@ -4,13 +4,13 @@ set -u  # erro se variável não definida
 
 echo "Instalando aplicativos do flatpak"
 
-flatpak install flathub com.obsproject.Studio -y
-flatpak install flathub com.google.Chrome -y
-flatpak install flathub com.discordapp.Discord -y
-flatpak install flathub com.valvesoftware.Steam -y 
-flatpak install flathub org.videolan.VLC -y
-flatpak install flathub it.mijorus.gearlever -y
-flatpak install flathub cc.arduino.IDE2 -y
+flatpak install -y --noninteractive flathub com.obsproject.Studio
+flatpak install -y --noninteractive flathub com.google.Chrome
+flatpak install -y --noninteractive flathub com.discordapp.Discord
+flatpak install -y --noninteractive flathub com.valvesoftware.Steam 
+flatpak install -y --noninteractive flathub org.videolan.VLC
+flatpak install -y --noninteractive flathub it.mijorus.gearlever
+flatpak install -y --noninteractive flathub cc.arduino.IDE2
 
 echo "Aplicativos do flatpak instalados com sucesso!"
 

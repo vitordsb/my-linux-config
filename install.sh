@@ -7,7 +7,12 @@ echo "🚀 Iniciando configuração do sistema..."
 # Garantir que está com sudo ativo
 if [ "$EUID" -ne 0 ]; then
   echo "❌ Execute com: sudo ./install.sh"
-  exit
+  exit 1
+fi
+
+if [ -z "${SUDO_USER:-}" ] || [ "$SUDO_USER" = "root" ]; then
+  echo "❌ Execute com sudo a partir de um usuário não-root (ex.: sudo ./install.sh)."
+  exit 1
 fi
 
 # Executa módulos

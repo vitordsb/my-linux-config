@@ -13,14 +13,14 @@ apt install -y fonts-firacode fonts-jetbrains-mono
 sudo fc-cache -fv
 
 echo "📦 Instalando pacotes de desenvolvimento..."
-apt install gnome-tweaks gnome-shell-extensions -y 
+apt install -y gnome-tweaks gnome-shell-extensions
 
 apt remove firefox -y --purge
 apt remove -y libreoffice* --purge
 
 echo "📦 Instalando o flatpak..."
-sudo apt install flatpak
-sudo apt install gnome-software-plugin-flatpak
+apt install -y flatpak
+apt install -y gnome-software-plugin-flatpak
 echo "📦 Instalando o Flathub..."
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
