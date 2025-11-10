@@ -20,10 +20,50 @@ if [ -z "$TARGET_HOME" ]; then
 fi
 
 FISH_CONFIG="$TARGET_HOME/.config/fish/config.fish"
+FISH_MIN_VERSION="3.4.0"
+
+ensure_fish_release_repo() {
+    if [ ! -r /etc/os-release ]; then
+        return
+    fi
+    # shellcheck disable=SC1091
+    . /etc/os-release
+    local tags
+    tags="$(printf '%s %s' "${ID:-}" "${ID_LIKE:-}" | tr '[:upper:]' '[:lower:]')"
+    case "$tags" in
+        *ubuntu*|*pop*|*linuxmint*|*elementary*)
+            if grep -Rqs "fish-shell/release-3" /etc/apt/sources.list /etc/apt/sources.list.d 2>/dev/null; then
+                return
+            fi
+            if ! command -v add-apt-repository >/dev/null 2>&1; then
+                apt install -y software-properties-common
+            fi
+            echo "➕ Adicionando PPA oficial do Fish Shell..."
+            add-apt-repository -y ppa:fish-shell/release-3
+            apt update
+            ;;
+        *)
+            ;;
+    esac
+}
+
+warn_if_old_fish() {
+    if ! command -v fish >/dev/null 2>&1; then
+        return
+    fi
+    local installed_version
+    installed_version="$(fish --version | awk '{print $3}')"
+    if ! dpkg --compare-versions "$installed_version" ge "$FISH_MIN_VERSION"; then
+        echo "⚠️  A versão do Fish (${installed_version}) é antiga e pode quebrar plugins (mínimo recomendado: ${FISH_MIN_VERSION})."
+        echo "⚠️  Considere atualizar manualmente adicionando o PPA oficial do Fish."
+    fi
+}
 
 echo "🐠 Instalando e configurando Fish Shell..."
 
-apt install -y fish
+ensure_fish_release_repo
+apt install -y fish fzf
+warn_if_old_fish
 chsh -s "$(command -v fish)" "$TARGET_USER"
 
 # Instala o gerenciador de plugins Fisher
